@@ -14,6 +14,7 @@ categoriesCollection = db["categories"]
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 
 class BookAll(Resource):
