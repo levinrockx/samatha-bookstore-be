@@ -9,7 +9,6 @@ from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
 
-
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 db = myclient["samatha"]
 booksCollection = db["books"]
@@ -24,7 +23,8 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 5*1024*1024
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+
 
 class BookAll(Resource):
     def get(self):
@@ -41,12 +41,31 @@ class BookAll(Resource):
         return {'status': 'success', 'data': {'categories': categorywiselist}}
 
 
+class Book(Resource):
+    def post(self):
+        req = request.get_json();
+        id = ObjectId(str(req['id']));
+        book = booksCollection.find_one({'_id': id})
+        return {'status': 'success', 'data': json.loads(json_util.dumps(book))}
+
+
+class Category(Resource):
+    def post(self):
+        req = request.get_json();
+        id = ObjectId(req["id"]);
+        category = categoriesCollection.find_one({"_id": id});
+        bookList = booksCollection.find({'category': category['category_name']})
+        # print(json.loads(json_util.dumps(bookList)))
+        return {'status': 'success',
+                'data': {"category_name": category['category_name'], "books": json.loads(json_util.dumps(bookList))}}
+
+
 class AddCategory(Resource):
     def post(self):
         category = request.get_json();
         id = 0;
         id = categoriesCollection.insert_one(category).inserted_id;
-        if len(id) != 0:
+        if len(str(id)) != 0:
             return {'status': 'success'}
         else:
             return {'status': 'error'}
@@ -79,11 +98,13 @@ class AddBookImage(Resource):
         else:
             return {'status': 'error'}
 
+
 class AddBook(Resource):
     def post(self):
         book = request.get_json();
         booksCollection.insert_one(book)
-        return {'status':'sucess'}
+        return {'status': 'success'}
+
 
 class AuthorAll(Resource):
     def get(self):
@@ -94,6 +115,7 @@ class AuthorAll(Resource):
         for author in authordblist:
             count = count + 1;
             authobj = {
+                "oid": str(author["_id"]["$oid"]),
                 "id": count,
                 "itemName": author["author_name"]
             };
@@ -104,25 +126,103 @@ class AuthorAll(Resource):
 class CategoryAll(Resource):
     def get(self):
         count = 0;
-        categoriesList =[];
+        categoriesList = [];
         categorydblist = json.loads(json_util.dumps(categoriesCollection.find({})));
         # categorydblist = categoriesCollection.find({});
         for category in categorydblist:
-            count = count+1;
+            count = count + 1;
             obj = {
-                "id" : count,
-                "itemName" : category["category_name"]
+                "oid": str(category["_id"]["$oid"]),
+                "id": count,
+                "itemName": category["category_name"]
             };
             categoriesList.append(obj);
         return {'status': 'success', "data": categoriesList}
 
+
+class EditCategory(Resource):
+    def post(self):
+        req = request.get_json();
+        id = ObjectId(str(req['id']));
+        category = categoriesCollection.find_one({"_id": id});
+        booksCollection.update_many({"category": category["category_name"]},
+                                    {"$set": {"category": req["category_name"]}})
+        categoriesCollection.update_one({"_id": id}, {"$set": {"category_name": req["category_name"]}})
+        return {"status": "success"}
+
+
+class EditAuthor(Resource):
+    def post(self):
+        req = request.get_json();
+        id = ObjectId(str(req['id']));
+        author = authorsCollection.find_one({"_id": id});
+        booksCollection.update_many({"author": author["author_name"]}, {"$set": {"author": req["author_name"]}})
+        authorsCollection.update_one({"_id": id}, {"$set": {"author_name": req["author_name"]}})
+        return {"status": "success"}
+
+
+class EditBook(Resource):
+    def post(self):
+        req = request.get_json();
+        # print(req);
+        id = ObjectId(str(req["id"]));
+        booksCollection.update_one({"_id": id},
+                                   {"$set":
+                                        {"title": req["title"],
+                                         "description": req["description"],
+                                         "author": req["author"],
+                                         "category": req["category"],
+                                         "price": req["price"],
+                                         "edition": req["edition"],
+                                         "image": req["image"]}
+                                    }
+                                   );
+        return {"status": "success"}
+
+
+class DeleteCategory(Resource):
+    def post(self):
+        req = request.get_json();
+        id = ObjectId(str(req['id']));
+        category = categoriesCollection.find_one({"_id": id});
+        booksCollection.update_many({"category": category["category_name"]},
+                                    {"$set": {"category": "Uncategorised"}});
+        categoriesCollection.delete_one({"_id": id});
+        return {"status": "success"}
+
+
+class DeleteAuthor(Resource):
+    def post(self):
+        req = request.get_json();
+        id = ObjectId(str(req['id']));
+        category = authorsCollection.find_one({"_id": id});
+        booksCollection.update_many({"author": category["author_name"]},
+                                    {"$set": {"author": ""}});
+        authorsCollection.delete_one({"_id": id});
+        return {"status": "success"}
+
+class DeleteBook(Resource):
+    def post(self):
+        req = request.get_json();
+        id = ObjectId(str(req['id']));
+        booksCollection.delete_one({"_id": id});
+        return {"status": "success"}
+
 api.add_resource(BookAll, '/api/bookall')
+api.add_resource(Book, '/api/book')
+api.add_resource(Category, '/api/category')
 api.add_resource(AddCategory, '/api/addcategory')
 api.add_resource(AddAuthor, '/api/addauthor')
 api.add_resource(AddBookImage, '/api/addbookimage')
 api.add_resource(AddBook, '/api/addbook')
 api.add_resource(CategoryAll, '/api/categoryall')
 api.add_resource(AuthorAll, '/api/authorall')
+api.add_resource(EditCategory, '/api/editcategory')
+api.add_resource(EditAuthor, '/api/editauthor')
+api.add_resource(EditBook, '/api/editbook')
+api.add_resource(DeleteCategory, '/api/deletecategory')
+api.add_resource(DeleteAuthor, '/api/deleteauthor')
+api.add_resource(DeleteBook, '/api/deletebook')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
