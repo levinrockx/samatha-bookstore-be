@@ -8,6 +8,7 @@ import pymongo
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
+import re
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 db = myclient["samatha"]
@@ -17,10 +18,9 @@ authorsCollection = db["authors"]
 developementCollection = db["developement"]
 loginCollection = db["login"]
 
-
 password = "samathaadmin"
 username = "samathaadmin"
-UPLOAD_FOLDER = "F:/samatha-bookstore/src/assets/img"
+UPLOAD_FOLDER = "/home/ubuntu/dist/samatha-bookstore/assets/img"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
@@ -205,6 +205,7 @@ class DeleteAuthor(Resource):
         authorsCollection.delete_one({"_id": id});
         return {"status": "success"}
 
+
 class DeleteBook(Resource):
     def post(self):
         req = request.get_json();
@@ -212,17 +213,41 @@ class DeleteBook(Resource):
         booksCollection.delete_one({"_id": id});
         return {"status": "success"}
 
+
 class Login(Resource):
     def post(self):
         login = loginCollection.find_one({})
         req = request.get_json();
-        if((req["username"] == username) and (req["password"] == password)):
+        if ((req["username"] == login["username"]) and (req["password"] == login["password"])):
             return {"status": "success"}
         else:
             return {"status": "login failed"}
 
 
-
+class Search(Resource):
+    def post(self):
+        req = request.get_json();
+        regx = re.compile(req["keyword"], re.IGNORECASE);
+        bookList = booksCollection.find(
+            {
+                "$or": [
+                    {
+                        "title": regx
+                    },
+                    {
+                        "category": regx
+                    },
+                    {
+                        "author": regx
+                    }
+                ]
+            }
+        );
+        dataList = [];
+        for obj in json.loads(json_util.dumps(bookList)):
+            dataList.append(obj);
+        print(req,dataList)
+        return {"status": "success","data":dataList}
 
 
 api.add_resource(BookAll, '/api/bookall')
@@ -241,6 +266,6 @@ api.add_resource(DeleteCategory, '/api/deletecategory')
 api.add_resource(DeleteAuthor, '/api/deleteauthor')
 api.add_resource(DeleteBook, '/api/deletebook')
 api.add_resource(Login, '/api/login')
-
+api.add_resource(Search, '/api/search')
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
