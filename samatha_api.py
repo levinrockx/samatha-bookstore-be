@@ -15,7 +15,11 @@ booksCollection = db["books"]
 categoriesCollection = db["categories"]
 authorsCollection = db["authors"]
 developementCollection = db["developement"]
+loginCollection = db["login"]
 
+
+password = "samathaadmin"
+username = "samathaadmin"
 UPLOAD_FOLDER = "F:/samatha-bookstore/src/assets/img"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -208,6 +212,19 @@ class DeleteBook(Resource):
         booksCollection.delete_one({"_id": id});
         return {"status": "success"}
 
+class Login(Resource):
+    def post(self):
+        login = loginCollection.find_one({})
+        req = request.get_json();
+        if((req["username"] == username) and (req["password"] == password)):
+            return {"status": "success"}
+        else:
+            return {"status": "login failed"}
+
+
+
+
+
 api.add_resource(BookAll, '/api/bookall')
 api.add_resource(Book, '/api/book')
 api.add_resource(Category, '/api/category')
@@ -223,6 +240,7 @@ api.add_resource(EditBook, '/api/editbook')
 api.add_resource(DeleteCategory, '/api/deletecategory')
 api.add_resource(DeleteAuthor, '/api/deleteauthor')
 api.add_resource(DeleteBook, '/api/deletebook')
+api.add_resource(Login, '/api/login')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
