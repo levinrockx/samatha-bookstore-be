@@ -13,8 +13,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/samatha_api.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="22" column="64" lean-forward="true" selection-start-line="22" selection-start-column="64" selection-end-line="22" selection-end-column="64" />
+            <state relative-caret-position="244">
+              <caret line="273" lean-forward="true" selection-start-line="273" selection-end-line="273" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
               </folding>
@@ -25,8 +25,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/Desktop/botzwebapp pyton/botzapp_api.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="32" selection-start-column="25" selection-end-column="32" />
+            <state relative-caret-position="425">
+              <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#32#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -43,6 +46,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>'</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -52,11 +56,12 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/author.json" />
+        <option value="$USER_HOME$/Desktop/botzwebapp pyton/botzapp_api.py" />
         <option value="$PROJECT_DIR$/samatha_api.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-36" />
     <option name="y" value="191" />
     <option name="width" value="1346" />
@@ -93,6 +98,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$/Desktop/botzwebapp pyton/botzapp_api.py" />
+    <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -181,20 +187,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/samatha_api.py">
+    <entry file="file://$USER_HOME$/Desktop/botzwebapp pyton/botzapp_api.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="22" column="64" lean-forward="true" selection-start-line="22" selection-start-column="64" selection-end-line="22" selection-end-column="64" />
+        <state relative-caret-position="425">
+          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" selection-end-column="16" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Desktop/botzwebapp pyton/botzapp_api.py">
+    <entry file="file://$PROJECT_DIR$/samatha_api.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="32" selection-start-column="25" selection-end-column="32" />
+        <state relative-caret-position="244">
+          <caret line="273" lean-forward="true" selection-start-line="273" selection-end-line="273" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

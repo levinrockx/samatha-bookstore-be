@@ -9,6 +9,7 @@ from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
 import re
+from flask_mail import Mail, Message
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 db = myclient["samatha"]
@@ -26,8 +27,18 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+mail = Mail(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+app.config.update(dict(
+   DEBUG = True,
+   MAIL_SERVER = 'smtp.gmail.com',
+   MAIL_PORT = 587,
+   MAIL_USE_TLS = True,
+   MAIL_USE_SSL = False,
+   MAIL_USERNAME = 'levinrockx@gmail.com',
+   MAIL_PASSWORD = 'paozafuaksdzqver',
+))
 
 
 class BookAll(Resource):
@@ -42,7 +53,7 @@ class BookAll(Resource):
                 "books": json.loads(json_util.dumps(booksCollection.find({"category": categoryobj["category_name"]})))
             }
             categorywiselist.append(obj);
-        return {'status': 'success', 'data': {'categories': categorywiselist}}
+        return {'status': 'success', 'data': {'categories': sorted(categorywiselist, key = lambda x: len(x["books"]),reverse=True)}}
 
 
 class Book(Resource):
@@ -246,8 +257,21 @@ class Search(Resource):
         dataList = [];
         for obj in json.loads(json_util.dumps(bookList)):
             dataList.append(obj);
-        print(req,dataList)
+        #print(req,dataList)
         return {"status": "success","data":dataList}
+
+
+class ContactUs(Resource):
+   def post(self):
+       submit = request.get_json();
+       print(submit);
+       msg = Message(submit['name'],
+                     sender=submit['email'],
+                     recipients=["levinrockx@gmail.com"])
+       mail.send(msg);
+       print(msg);
+       return {'status': 'success'}, 201
+
 
 
 api.add_resource(BookAll, '/api/bookall')
@@ -267,5 +291,6 @@ api.add_resource(DeleteAuthor, '/api/deleteauthor')
 api.add_resource(DeleteBook, '/api/deletebook')
 api.add_resource(Login, '/api/login')
 api.add_resource(Search, '/api/search')
+api.add_resource(ContactUs, '/api/contactus')
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
